@@ -17,7 +17,8 @@ jobs:
 
       - name: Update CPAN (optional)
         run: |
-          cpan install CPAN  # Corrected command
+          cpan
+          cpan install CPAN
           reload cpan
 
       - name: Install Perl
