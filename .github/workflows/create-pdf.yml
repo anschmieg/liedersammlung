@@ -25,7 +25,7 @@ jobs:
         run: sudo cpan || exit 1
       
       - name: Update CPAN (optional)
-        run: sudo cpan -q -u || exit 1
+        run: sudo cpan -u || exit 1
       
       - name: Configure CPAN
         run: |
