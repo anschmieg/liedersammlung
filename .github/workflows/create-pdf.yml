@@ -1,0 +1,33 @@
+name: ChordPro to PDF Conversion
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install ChordPro
+        run: |
+          pip install chordpro
+
+      - name: Generate PDF from ChordPro files
+        run: |
+          mkdir pdf_output
+          for file in songs/*.chordpro; do
+            chordpro "$file" -o "pdf_output/$(basename "$file" .chordpro).pdf"
+          done
+
+      - name: Upload PDF as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: chordpro-pdf
+          path: pdf_output
