@@ -19,6 +19,13 @@ jobs:
         run: |
           cpan
         shell: bash  # Ensure bash for variable export
+
+      - name: Print CPAN environment variables  # New step for debugging
+        run: printenv
+
+      - name: Test CPAN configuration with sudo  # New step for debugging
+        run: sudo cpan
+
       - name: Export CPAN environment variables
         run: |
           echo "PATH=$PATH" >> $GITHUB_ENV
@@ -27,19 +34,21 @@ jobs:
           echo "PERL_MB_OPT=$PERL_MB_OPT" >> $GITHUB_ENV
           echo "PERL_MM_OPT=$PERL_MM_OPT" >> $GITHUB_ENV
 
+      - name: Check Perl version  # New step for debugging
+        run: perl -v
+
       - name: Install Perl (with sudo)
         run: |
           sudo apt-get update || exit 1
           sudo apt-get install -y perl || exit 1
-      
+
       - name: Install ChordPro prerequisites with apt (with sudo)
         run: |
           sudo apt-get install -y libpdf-api2-perl libimage-info-perl || exit 1
-      
+
       - name: Install ChordPro reference implementation (with sudo)
         run: |
           sudo cpan install ChordPro
-
 
       - name: Check for songs directory
         run: |
