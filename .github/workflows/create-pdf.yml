@@ -24,6 +24,10 @@ jobs:
         run: |
           sudo apt-get install -y libpdf-api2-perl libimage-info-perl || exit 1
 
+      - name: Install ChordPro reference implementation
+        run: |
+          sudo cpan install ChordPro
+
       - name: Check for songs directory
         run: |
           test -d songs || exit 1
