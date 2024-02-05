@@ -22,7 +22,7 @@ jobs:
 
       - name: Install ChordPro prerequisites with apt
         run: |
-          sudo apt-get install -y libpdf-api2-perl libtext-layout-perl libapp-packager-perl libfile-loadlines-perl libstring-interpolate-named-perl libimage-info-perl || exit 1
+          sudo apt-get install -y libpdf-api2-perl libimage-info-perl || exit 1
 
       - name: Check for songs directory
         run: |
