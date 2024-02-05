@@ -11,28 +11,35 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: List files in songs directory
         run: ls songs || exit 1
 
-      - name: Update CPAN (optional)
+      - name: Configure CPAN
         run: |
           cpan
-          cpan install CPAN
-          reload cpan
+        shell: bash  # Ensure bash for variable export
+      - name: Export CPAN environment variables
+        run: |
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "PERL5LIB=$PERL5LIB" >> $GITHUB_ENV
+          echo "PERL_LOCAL_LIB_ROOT=$PERL_LOCAL_LIB_ROOT" >> $GITHUB_ENV
+          echo "PERL_MB_OPT=$PERL_MB_OPT" >> $GITHUB_ENV
+          echo "PERL_MM_OPT=$PERL_MM_OPT" >> $GITHUB_ENV
 
-      - name: Install Perl
+      - name: Install Perl (with sudo)
         run: |
           sudo apt-get update || exit 1
           sudo apt-get install -y perl || exit 1
-
-      - name: Install ChordPro prerequisites with apt
+      
+      - name: Install ChordPro prerequisites with apt (with sudo)
         run: |
           sudo apt-get install -y libpdf-api2-perl libimage-info-perl || exit 1
-
-      - name: Install ChordPro reference implementation
+      
+      - name: Install ChordPro reference implementation (with sudo)
         run: |
           sudo cpan install ChordPro
+
 
       - name: Check for songs directory
         run: |
