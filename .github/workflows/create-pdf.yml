@@ -2,8 +2,8 @@ name: Songs to PDF
 
 on:
   push:
-    branches:
-      - main  # Adjust this to your default branch
+    branches: [ main ]
+  pull_request:
 
 jobs:
   build:
@@ -11,28 +11,34 @@ jobs:
 
     steps:
       - name: List files in songs directory
-        run: ls songs
-  
+        run: ls songs || exit 1
+
       - name: Install Perl
         run: |
-          sudo apt-get update
-          sudo apt-get install -y perl
+          sudo apt-get update || exit 1
+          sudo apt-get install -y perl || exit 1
 
       - name: Install ChordPro prerequisites with apt
-          sudo apt-get install -y libpdf-api2-perl libtext-layout-perl libapp-packager-perl libfile-loadlines-perl libstring-interpolate-named-perl libimage-info-perl
-
-      - name: Install ChordPro reference implementation
-          sudo cpan install chordpro
-
-      - name: Generate PDF 
         run: |
-          mkdir pdf_output
+          sudo apt-get install -y libpdf-api2-perl libtext-layout-perl libapp-packager-perl libfile-loadlines-perl libstring-interpolate-named-perl libimage-info-perl || exit 1
+
+      - name: Check for songs directory
+        run: |
+          test -d songs || exit 1
+
+      - name: Check for valid ChordPro files
+        run: |
+          find songs -name "*.chordpro" -print0 | xargs -0 chordpro --validate || exit 1
+
+      - name: Generate PDF
+        run: |
+          mkdir -p pdf_output
           for file in songs/*.chordpro; do
-            chordpro "$file" -o "pdf_output/$(basename "$file" .chordpro).pdf"
+            chordpro "$file" -o "pdf_output/$(basename "$file" .chordpro).pdf" || exit 1
           done
 
       - name: Upload PDF as Artifact
         uses: actions/upload-artifact@v2
         with:
           name: chordpro-pdf
-          path: pdf_output
+          path: ${{ env.WORKSPACE }}/pdf_output/
