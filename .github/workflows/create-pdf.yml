@@ -3,21 +3,18 @@ name: ChordPro to PDF Conversion
 on:
   push:
     branches:
-      - main
+      - main  # Adjust this to your default branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Install ChordPro
+      - name: Set up Perl and ChordPro
         run: |
-          pip install chordpro
+          sudo apt-get update
+          sudo apt-get install -y perl
+          sudo cpan install chordpro
 
       - name: Generate PDF from ChordPro files
         run: |
