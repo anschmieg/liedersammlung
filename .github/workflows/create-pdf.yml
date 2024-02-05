@@ -1,4 +1,4 @@
-name: ChordPro to PDF Conversion
+name: Songs to PDF
 
 on:
   push:
@@ -10,13 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Perl and ChordPro
+      - name: List files in songs directory
+        run: ls songs
+  
+      - name: Install Perl
         run: |
           sudo apt-get update
           sudo apt-get install -y perl
+
+      - name: Install ChordPro prerequisites with apt
+          sudo apt-get install -y libpdf-api2-perl libtext-layout-perl libapp-packager-perl libfile-loadlines-perl libstring-interpolate-named-perl libimage-info-perl
+
+      - name: Install ChordPro reference implementation
           sudo cpan install chordpro
 
-      - name: Generate PDF from ChordPro files
+      - name: Generate PDF 
         run: |
           mkdir pdf_output
           for file in songs/*.chordpro; do
