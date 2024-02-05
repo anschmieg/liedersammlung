@@ -15,6 +15,18 @@ jobs:
       - name: List files in songs directory
         run: ls songs || exit 1
 
+      - name: Print environment variables
+        run: printenv
+
+      - name: Test CPAN configuration with sudo
+        run: sudo cpan
+
+      - name: Test CPAN configuration with sudo (if permissions issue) - TEMPORARY # TEMPORARY
+        run: sudo cpan || exit 1
+      
+      - name: Update CPAN (optional)
+        run: sudo cpan -q -u || exit 1
+      
       - name: Configure CPAN
         run: |
           cpan
