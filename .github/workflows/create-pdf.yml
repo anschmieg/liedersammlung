@@ -11,22 +11,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
+      - name: Update CPAN (optional)
+        run: |
+          install CPAN
+          reload cpan
+
+      - name: Install ChordPro with potential namespace fix
+        run: |
+          sudo cpan install App::ChordPro  # Adjust namespace if needed
+
       - name: List files in songs directory
         run: ls songs || exit 1
 
-      - name: Install Perl
+      - name: Install Perl dependencies
         run: |
           sudo apt-get update || exit 1
-          sudo apt-get install -y perl || exit 1
-
-      - name: Install ChordPro prerequisites with apt
-        run: |
           sudo apt-get install -y libpdf-api2-perl libimage-info-perl || exit 1
-
-      - name: Install ChordPro reference implementation
-        run: |
-          sudo cpan install ChordPro
 
       - name: Check for songs directory
         run: |
