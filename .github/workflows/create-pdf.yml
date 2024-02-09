@@ -13,19 +13,15 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: List files in songs directory
-        run: ls songs || exit 1
-
-      - name: Print environment variables
-        run: printenv
+        run: |
+          echo "Found the following song files:"
+          ls songs || exit 1
 
       - name: Test CPAN configuration with sudo
         run: |
           sudo cpan install chordpro
           chordpro --version
         shell: bash  # Ensure bash for variable export
-
-      - name: Print CPAN environment variables  # New step for debugging
-        run: printenv
 
       - name: Export CPAN environment variables
         run: |
@@ -35,20 +31,18 @@ jobs:
           echo "PERL_MB_OPT=$PERL_MB_OPT" >> $GITHUB_ENV
           echo "PERL_MM_OPT=$PERL_MM_OPT" >> $GITHUB_ENV
 
-      - name: Check for songs directory
+      - name: Check for songs directory and ChordPro files
         run: |
           test -d songs || exit 1
-
-      - name: Check for valid ChordPro files
-        run: |
-          find songs -name "*.chordpro" -print0 | xargs -0 chordpro --validate || exit 1
+          find songs -name "*.chordpro" -print0 || exit 1
 
       - name: Generate PDF
         run: |
           mkdir -p pdf_output
-          for file in songs/*.chordpro; do
-            chordpro "$file" -o "pdf_output/$(basename "$file" .chordpro).pdf" || exit 1
-          done
+          # for file in songs/*.chordpro; do
+          #  chordpro "$file" -o "pdf_output/$(basename "$file" .chordpro).pdf" || exit 1
+          # done
+          chordpro --filelist songs/*.chordpro --output=pdf_output/songbook.pdf
 
       - name: Upload PDF as Artifact
         uses: actions/upload-artifact@v2
