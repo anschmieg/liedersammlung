@@ -36,6 +36,25 @@ jobs:
           test -d songs || exit 1
           find songs -name "*.chordpro" -print0 || exit 1
 
+      - name: Validate ChordPro files
+        run: |
+          # Install the "File::Spec" module (if not already present)
+          cpan install File::Spec
+      
+          # Loop through each `.chordpro` file in the "songs" directory
+          for file in songs/*.chordpro; do
+            # Use "File::Spec" to construct the full path with environment variables
+            full_path=$(perl -MFile::Spec -e 'print File::Spec::rel2abs("$file", $ENV{PWD})')
+      
+            # Validate the file using "chordpro --validate"
+            chordpro --validate "$full_path" || exit 1
+      
+            # Optionally: Print validation output for debugging
+            # echo "Validation output for $file:"
+            # cat "$full_path.validate.log"
+          done
+
+
       - name: Generate PDF
         run: |
           mkdir -p pdf_output
