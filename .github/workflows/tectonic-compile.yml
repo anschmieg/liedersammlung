@@ -16,5 +16,5 @@ jobs:
       - name: Upload PDF
         uses: actions/upload-artifact@v3
         with:
-          name: songbook
+          name: songbook.zip
           path: build/Liedersammlung/Liedersammlung.pdf
