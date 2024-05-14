@@ -1,47 +1,53 @@
-# %%
-# This script converts all files in the songs directory from
-# ChordPro to LaTeX and saves the result to a new file named
-# > latex/songs.tex <
-
 import os
+import argparse
+import unittest
 from Converter import chordpro_to_latex
 
-cwd = os.getcwd()
-songDir = os.path.join(cwd, "songs")
-sourceDir = os.path.join(cwd, "src")
 
-# Remove old file, create dir and new file
-os.makedirs(sourceDir) if not os.path.exists(sourceDir) else None
+class TestChordproToLatex(unittest.TestCase):
+    def test_basic_conversion(self):
+        chordpro_input = "{title:Test Song}\n{key:C}\n[C]This is a [G]test song"
+        expected_output = "\\begin{songWithKeys}[key=C]{Test Song}\n\\Ch{C}This is a \\Ch{G}test song\n\\end{songWithKeys}"
+        self.assertEqual(chordpro_to_latex(chordpro_input), expected_output)
 
-songsTex = os.path.join(sourceDir, "index.tex")
+    def test_unknown_directive(self):
+        chordpro_input = "{unknown:Test}\n[C]This is a [G]test song"
+        expected_output = (
+            "unknown:Test\n\\Ch{C}This is a \\Ch{G}test song\n\\end{songWithKeys}"
+        )
+        self.assertEqual(chordpro_to_latex(chordpro_input), expected_output)
 
-if os.path.exists(songsTex):
-    os.remove(songsTex)
 
-with open(songsTex, "w") as file:
-    file.write("")
+def run_tests():
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestChordproToLatex)
+    unittest.TextTestRunner().run(suite)
 
-# %%
-# Iterate over the files and convert them to LaTeX
-# then append the result to songs.tex
 
-# Get all files in the songs directory that end with .cho, .chopro, .chordpro, .crd, .txt, .pro
-files = [
-    file
-    for file in os.listdir("songs")
-    if file.endswith(".cho")
-    or file.endswith(".chopro")
-    or file.endswith(".chordpro")
-    or file.endswith(".crd")
-    or file.endswith(".txt")
-    or file.endswith(".pro")
-]
+def convert_files(songsDir, latexDir):
+    os.makedirs(latexDir, exist_ok=True)
 
-for file in files:
-    with open(os.path.join(songDir, file), "r", encoding="utf-8") as file:
-        input = file.read()
-        output = chordpro_to_latex(input)
-        with open(songsTex, "a") as file:
-            file.write(output)
-            file.write("\n\n")
-# %%
+    songsTex = os.path.join(latexDir, "index.tex")
+
+    with open(songsTex, "w") as file:
+        for song_file in os.listdir(songsDir):
+            if song_file.endswith(
+                (".cho", ".chopro", ".chordpro", ".crd", ".txt", ".pro")
+            ):
+                with open(os.path.join(songsDir, song_file), "r", encoding="utf-8") as f:
+                    input = f.read()
+                    output = chordpro_to_latex(input)
+                    file.write(output)
+                    file.write("\n\n")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--test", action="store_true", help="Run tests")
+    parser.add_argument("-i", "--songs", type=str, help="Directory containing song files, default 'songs'", action="store", default="songs")
+    parser.add_argument("-o", "--latex", type=str, help="Directory to write output files, default 'src'", action="store", default="src")
+    args = parser.parse_args()
+
+    if args.test:
+        run_tests()
+    else:
+        convert_files(args.songs, args.latex)

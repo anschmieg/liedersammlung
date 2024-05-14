@@ -1,4 +1,4 @@
-# %%
+#%%
 def chordpro_to_latex(input):
     """
     Convert ChordPro to LaTeX
@@ -10,44 +10,34 @@ def chordpro_to_latex(input):
     song_meta = {}
     output = ""
 
-    meta_order = ['title', 'key', 'copyright', 'composer']
-    
-    # Define ChordPro directives and their Leadsheet equivalents
-    # meta_directives = {
-    #     "title": "title",
-    #     "artist": "music",
-    #     "subtitle": "subtitle",
-    #     "arranger": "composer",
-    #     "composer": "composer",
-    #     "lyricist": "lyrics",
-    #     "lyrics": "lyrics",
-    #     "key": "key",
-    #     "tempo": "tempo",
-    #     "time": "tempo",
-    #     "capo": "capo",
-    # }
+    # Define ChordPro directives and their LaTeX equivalents
+    meta_directives = {
+        "title": "title",
+        "artist": "music",
+        "subtitle": "subtitle",
+        "arranger": "music",
+        "composer": "music",
+        "lyricist": "lyrics",
+        "lyrics": "lyrics",
+        "key": "key",
+        # "tempo": "tempo",
+        # "time": "tempo",
+        # "capo": "capo",
+    }
     directives = {
         "comment": "instruction",
         "start_of_chorus": "begin{SBChorus}",
         "end_of_chorus": "end{SBChorus}",
         "start_of_verse": "begin{SBVerse}",
         "end_of_verse": "end{SBVerse}",
-        "start_of_bridge": "begin{bridge}",
-        "end_of_bridge": "end{bridge}",
-        "start_of_tab": "begin{tab}",
-        "end_of_tab": "end{tab}",
-        "start_of_grid": "begin{grid}",
-        "end_of_grid": "end{grid}",
+        "start_of_bridge": "begin{SBBridge}",
+        "end_of_bridge": "end{SBBridge}",
         "soc": "begin{SBChorus}",
         "eoc": "end{SBChorus}",
         "sov": "begin{SBVerse}",
         "eov": "end{SBVerse}",
-        "sob": "begin{bridge}",
-        "eob": "end{bridge}",
-        "sot": "begin{tab}",
-        "eot": "end{tab}",
-        "sog": "begin{grid}",
-        "eog": "end{grid}",
+        "sob": "begin{SBBridge}",
+        "eob": "end{SBBridge}",
         "new_page": "newpage",
         "np": "newpage",
     }
@@ -65,7 +55,7 @@ def chordpro_to_latex(input):
         nonlocal output
         nonlocal song_meta
         # if directive is a song property, store it in the dictionary
-        if content and directive in meta_order:
+        if content and directive in meta_directives:
             song_meta[directive] = content
         # if directive is valid and has content, add it as an argument
         elif content and directive in directives:
@@ -73,13 +63,16 @@ def chordpro_to_latex(input):
         # otherwise just add the directive
         elif directive in directives:
             output += "\\" + directives[directive] + "\n"
-        # ignore directives not in meta_order
+        # if directive is unknown, add it as plain text
+        else:
+            output += directive + ":" + (content if content else "") + "\n"
+            return False  # return False to indicate that the directive is unknown
         return True
 
     def handle_line(line):
         nonlocal output
         # Change [test] to \Ch{test}
-        line = line.replace("[", "\\Ch{").replace("]", "}")
+        line = line.replace("[", "\\Ch{").replace("]", "}{}")
         output += line + "\n"
         return True
 
@@ -109,19 +102,46 @@ def chordpro_to_latex(input):
             except:
                 fallback(line)
 
-    # Sort the meta directives based on the predefined order
-    song_meta = {k: song_meta[k] for k in meta_order if k in song_meta}
-
     # Generate the LaTeX result
-    output = "\\begin{song}{" + ', '.join(song_meta.values()) + "}\n" + output + "\\end{song}"
+    # only output the \begin{songWithKeys}[]{} command if all directives are known
+    if all(handle_directive(directive, content) for directive, content in song_meta.items()):
+        # output the song metadata as arguments to the \begin{songWithKeys} command
+        output = "\\begin{song}[" + ", ".join(f"{k}={v}" for k, v in song_meta.items() if k != "title") + "]{" + song_meta.get("title", "") + "}\n" + output + "\\end{song}"
+    # otherwise output only the known directives and unknown directives as plain text
+    else:
+        output = "\n".join(
+            f"{k}: {v}" for k, v in song_meta.items() if k != "title"
+        ) + "\n" + output + "\\end{song}"
+
     return output
 
 
-# %%
-# Try with songs/sonne.cho
-# with open("songs/sonne.cho", "r") as file:
-#     input = file.read()
-#     output = chordpro_to_latex(input)
-#     print(output)
 
+
+
+########
+# Test #
+# only run in interactive mode
+
+try:
+    if __IPYTHON__:
+        import os
+        cwd = os.getcwd()
+        songDir = os.path.join(cwd, "songs")
+        sourceDir = os.path.join(cwd, "src")
+
+        os.makedirs(sourceDir, exist_ok=True)
+
+        songsTex = os.path.join(sourceDir, "index.tex")
+        with open(songsTex, "w") as file:
+            for song_file in os.listdir(songDir):
+                if song_file.endswith((".cho", ".chopro", ".chordpro", ".crd", ".txt", ".pro")):
+                    with open(os.path.join(songDir, song_file), "r", encoding="utf-8") as f:
+                        input = f.read()
+                        output = chordpro_to_latex(input)
+                        print(output.split("\n")[0])
+                        
+except NameError:
+    # running from CLI
+    pass
 # %%
