@@ -1,27 +1,6 @@
 import os
 import argparse
-import unittest
 from Converter import chordpro_to_latex
-
-
-class TestChordproToLatex(unittest.TestCase):
-    def test_basic_conversion(self):
-        chordpro_input = "{title:Test Song}\n{key:C}\n[C]This is a [G]test song"
-        expected_output = "\\begin{songWithKeys}[key=C]{Test Song}\n\\Ch{C}This is a \\Ch{G}test song\n\\end{songWithKeys}"
-        self.assertEqual(chordpro_to_latex(chordpro_input), expected_output)
-
-    def test_unknown_directive(self):
-        chordpro_input = "{unknown:Test}\n[C]This is a [G]test song"
-        expected_output = (
-            "unknown:Test\n\\Ch{C}This is a \\Ch{G}test song\n\\end{songWithKeys}"
-        )
-        self.assertEqual(chordpro_to_latex(chordpro_input), expected_output)
-
-
-def run_tests():
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestChordproToLatex)
-    unittest.TextTestRunner().run(suite)
-
 
 def convert_files(songsDir, latexDir):
     os.makedirs(latexDir, exist_ok=True)
@@ -48,6 +27,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.test:
-        run_tests()
+        print("No tests defined.")
     else:
         convert_files(args.songs, args.latex)

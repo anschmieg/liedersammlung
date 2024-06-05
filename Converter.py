@@ -11,6 +11,11 @@ def chordpro_to_latex(input):
     output = ""
 
     # Define ChordPro directives and their LaTeX equivalents
+    latex = {
+        "env": "song",
+        "chord_marker": "guitarChord",   
+    }
+    
     meta_directives = {
         "title": "title",
         "artist": "music",
@@ -25,21 +30,21 @@ def chordpro_to_latex(input):
         # "capo": "capo",
     }
     directives = {
-        "comment": "instruction",
-        "start_of_chorus": "begin{SBChorus}",
-        "end_of_chorus": "end{SBChorus}",
-        "start_of_verse": "begin{SBVerse}",
-        "end_of_verse": "end{SBVerse}",
-        "start_of_bridge": "begin{SBBridge}",
-        "end_of_bridge": "end{SBBridge}",
-        "soc": "begin{SBChorus}",
-        "eoc": "end{SBChorus}",
-        "sov": "begin{SBVerse}",
-        "eov": "end{SBVerse}",
-        "sob": "begin{SBBridge}",
-        "eob": "end{SBBridge}",
-        "new_page": "newpage",
-        "np": "newpage",
+        "comment": "",
+        "start_of_chorus": "",
+        "end_of_chorus": "",
+        "start_of_verse": "",
+        "end_of_verse": "",
+        "start_of_bridge": "",
+        "end_of_bridge": "",
+        "soc": "",
+        "eoc": "",
+        "sov": "",
+        "eov": "",
+        "sob": "",
+        "eob": "",
+        "new_page": "",
+        "np": "",
     }
 
     def fallback(exp):
@@ -72,7 +77,7 @@ def chordpro_to_latex(input):
     def handle_line(line):
         nonlocal output
         # Change [test] to \Ch{test}
-        line = line.replace("[", "\\Ch{").replace("]", "}{}")
+        line = line.replace("[", "\\" + latex["chord_marker"] + "{").replace("]", "}")
         output += line + "\n"
         return True
 
@@ -102,11 +107,10 @@ def chordpro_to_latex(input):
             except:
                 fallback(line)
 
-    # Generate the LaTeX result
-    # only output the \begin{songWithKeys}[]{} command if all directives are known
+
     if all(handle_directive(directive, content) for directive, content in song_meta.items()):
-        # output the song metadata as arguments to the \begin{songWithKeys} command
-        output = "\\begin{song}[" + ", ".join(f"{k}={v}" for k, v in song_meta.items() if k != "title") + "]{" + song_meta.get("title", "") + "}\n" + output + "\\end{song}"
+        # output the song metadata as arguments to the \begin command
+        output = "\\begin{" + latex["env"] + "}[" + ", ".join(f"{k}={v}" for k, v in song_meta.items() if k != "title") + "]{" + song_meta.get("title", "") + "}\n" + output + "\\end{" + latex["env"] + "}"
     # otherwise output only the known directives and unknown directives as plain text
     else:
         output = "\n".join(
