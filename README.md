@@ -1,4 +1,4 @@
-[![ChordPro to PDF Conversion](https://github.com/schmiega/liedersammlung/actions/workflows/create-pdf.yml/badge.svg)](https://github.com/schmiega/liedersammlung/actions/workflows/create-pdf.yml)
+[![ChordPro to PDF Conversion](https://github.com/schmiega/liedersammlung/actions/workflows/tectonic-compile.yml/badge.svg)](https://github.com/schmiega/liedersammlung/actions/workflows/tectonic-compile.yml)
 
 # Liedersammlung
 Dieses Repository enthält meine persönliche Liedersammlung. 
