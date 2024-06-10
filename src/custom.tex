@@ -1,0 +1,30 @@
+\usepackage{keyval}
+
+\makeatletter
+% Define the keys
+\define@key{song}{subtitle}{\def\songSubtitle{#1}}
+\define@key{song}{composer}{\def\songComposer{#1}}
+\define@key{song}{lyrics}{\def\songLyrics{#1}}
+\define@key{song}{key}{\def\songKey{#1}}
+\define@key{song}{capo}{\def\songCapo{#1}}
+\makeatother
+
+\newenvironment{song}[2]{ % This environment takes 2 arguments: the title and a set of key-value pairs
+    \def\songTitle{#1} % Set the title
+    \setkeys{song}{#2} % Set the rest of the keys
+    \section*{\songTitle} % Title
+    \subsection*{\songSubtitle} % Subtitle
+    \begin{flushright}
+    \textit{\songComposer} % Composer
+    \end{flushright}
+    \begin{verse}
+    \songLyrics % Lyrics
+    \end{verse}
+    \begin{flushleft}
+    \textit{Key: \songKey} % Key
+    \textit{Capo: \songCapo} % Capo
+    \end{flushleft}
+}
+{
+    \newpage % Start a new page after each song
+}
