@@ -1,4 +1,3 @@
-#%%
 def chordpro_to_latex(input):
     """
     Convert ChordPro to LaTeX
@@ -18,16 +17,16 @@ def chordpro_to_latex(input):
     
     meta_directives = {
         "title": "title",
-        "artist": "music",
         "subtitle": "subtitle",
-        "arranger": "music",
-        "composer": "music",
-        "lyricist": "lyrics",
+        "artist": "composer",
         "lyrics": "lyrics",
         "key": "key",
+        "capo": "capo",
+        "lyricist": "lyrics",
+        "arranger": "composer",
+        "composer": "composer",
         # "tempo": "tempo",
         # "time": "tempo",
-        # "capo": "capo",
     }
     directives = {
         "comment": "",
@@ -59,6 +58,7 @@ def chordpro_to_latex(input):
     def handle_directive(directive, content=None):
         nonlocal output
         nonlocal song_meta
+
         # if directive is a song property, store it in the dictionary
         if content and directive in meta_directives:
             song_meta[directive] = content
@@ -72,8 +72,9 @@ def chordpro_to_latex(input):
         else:
             output += directive + ":" + (content if content else "") + "\n"
             return False  # return False to indicate that the directive is unknown
-        return True
 
+        return True
+    
     def handle_line(line):
         nonlocal output
         # Change [test] to \Ch{test}
@@ -107,45 +108,10 @@ def chordpro_to_latex(input):
             except:
                 fallback(line)
 
+    # Extract the title from the song metadata
+    title = song_meta.pop('title')
 
-    if all(handle_directive(directive, content) for directive, content in song_meta.items()):
-        # output the song metadata as arguments to the \begin command
-        output = "\\begin{" + latex["env"] + "}[" + ", ".join(f"{k}={v}" for k, v in song_meta.items() if k != "title") + "]{" + song_meta.get("title", "") + "}\n" + output + "\\end{" + latex["env"] + "}"
-    # otherwise output only the known directives and unknown directives as plain text
-    else:
-        output = "\n".join(
-            f"{k}: {v}" for k, v in song_meta.items() if k != "title"
-        ) + "\n" + output + "\\end{song}"
-
+    # output the song metadata as arguments to the \begin command
+    output = "\\begin{" + latex["env"] + "}{" + title + "}{" + ", ".join(f"{arg}={{{song_meta[arg]}}}" for arg in song_meta) + "}\n" + output + "\\end{" + latex["env"] + "}"
     return output
 
-
-
-
-
-########
-# Test #
-# only run in interactive mode
-
-try:
-    if __IPYTHON__:
-        import os
-        cwd = os.getcwd()
-        songDir = os.path.join(cwd, "songs")
-        sourceDir = os.path.join(cwd, "src")
-
-        os.makedirs(sourceDir, exist_ok=True)
-
-        songsTex = os.path.join(sourceDir, "index.tex")
-        with open(songsTex, "w") as file:
-            for song_file in os.listdir(songDir):
-                if song_file.endswith((".cho", ".chopro", ".chordpro", ".crd", ".txt", ".pro")):
-                    with open(os.path.join(songDir, song_file), "r", encoding="utf-8") as f:
-                        input = f.read()
-                        output = chordpro_to_latex(input)
-                        print(output.split("\n")[0])
-                        
-except NameError:
-    # running from CLI
-    pass
-# %%

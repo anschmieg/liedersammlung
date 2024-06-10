@@ -1,5 +1,7 @@
-{title: 500 Miles The Proclaimers}
-{tempo: 132}
+{title: 500 Miles}
+{subtitle: When I Wake Up}
+{composer: The Proclaimers}
+{capo: 2}
 
 Intro  
 [D] 1 2 3 4    [D] 2 2 3 4    [D] 3 2 3 4    [D] 4 2 3 4
