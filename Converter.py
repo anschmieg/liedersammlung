@@ -78,11 +78,34 @@ def chordpro_to_latex(input):
 
         return True
     
+    import re
+
     def handle_line(line):
         nonlocal output
-        # Change [test] to \Ch{test}
-        line = line.replace("[", "\\" + latex["chord_marker"] + "{").replace("]", "}")
-        output += line + "\n"
+        elements = re.findall(r'\[([^\]]+)\]|([^\[]+)', line)
+        last_element_was_chord = False
+        line_content_added = False  # Track if content was added to the line
+
+        for chord, text in elements:
+            if chord:
+                # If the last element was a chord, add LaTeX space break '~'
+                if last_element_was_chord:
+                    output += "~" 
+                output += "\\" + latex["chord_marker"] + "{" + chord + "}"
+                last_element_was_chord = True
+                line_content_added = True
+            if text:
+                output += text
+                last_element_was_chord = False
+                line_content_added = True
+
+        # Append "\\" and newline to the end of the line if content was added
+        if line_content_added:
+            output += " \\\\\n"
+        else:
+            # Ensure not to add more than one consecutive line break to avoid LaTeX errors
+            if not (output.endswith("\n\n") or output.endswith("\\\\")):
+                output += "\n"
         return True
 
     input = input.strip()
