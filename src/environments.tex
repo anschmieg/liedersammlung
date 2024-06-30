@@ -35,6 +35,7 @@
 \newenvironment{songChorus}
 {%
     % Begin the mdframed environment to always show the grey bar and "Chorus" line
+    \vspace*{2\sectionVspace}%
     \begin{mdframed}[leftline=true, linecolor=gray, linewidth=2pt, topline=false, bottomline=false, rightline=false]%
         \textit{Chorus}%
         \vspace*{\sectionVspace}%
@@ -44,3 +45,30 @@
         % End the mdframed environment
     \end{mdframed}%
 }
+
+\newcounter{songVerseCounter}
+\AtBeginEnvironment{song}{\setcounter{songVerseCounter}{0}}
+\newenvironment{songVerse}
+{%
+    \stepcounter{songVerseCounter}%
+    \vspace*{2\sectionVspace}%
+    \textit{Verse \arabic{songVerseCounter}}%
+    \vspace*{\sectionVspace}%
+    \par%
+}%
+{}%
+
+\newenvironment{songBridge}
+{%
+    % Begin the mdframed environment to always show the grey bar and "Chorus" line
+    \vspace*{2\sectionVspace}%
+    \begin{mdframed}[leftline=true, linecolor=lightgray, linewidth=1pt, topline=false, bottomline=false, rightline=false]%
+        \textit{Bridge}%
+        \vspace*{\sectionVspace}%
+        \par%
+        }
+        {%
+        % End the mdframed environment
+    \end{mdframed}%
+}%
+{}%
