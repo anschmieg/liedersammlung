@@ -2,8 +2,9 @@
 \usepackage{kvoptions}
 \usepackage{keyval}
 \usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{mdframed}
+\usepackage{xcolor} % Needed for colors
+\usepackage{mdframed} % Needed for left line
+\usepackage{etoolbox} % Needed for empty key check
 
 % set variable for section heading vspace 
 \newlength{\sectionVspace}
@@ -18,34 +19,56 @@
 \define@key{song}{artist}{\def\songArtist{#1}} % Define the artist key
 
 % Default values
-\newcommand{\songSubtitle}{Unknown Subtitle}
+\newcommand{\songSubtitle}{}
 \newcommand{\songComposer}{Unknown Composer}
-\newcommand{\songKey}{\@empty} % Use \@empty for comparison
-\newcommand{\songCapo}{\@empty} % Use \@empty for comparison
-\newcommand{\songArtist}{\@empty} % Default value for artist
+\newcommand{\songKey}{} % Empty default value
+\newcommand{\songCapo}{} % Empty default value
+\newcommand{\songArtist}{} % Empty default value
 
 \newenvironment{song}[2]{%
-    \def\songTitle{#1}% Set the title
-    \setkeys{song}{#2}% Set the rest of the keys
-    \section*{\songTitle}% Title
-    \subsection*{\songSubtitle}% Subtitle
-    \begin{flushright}
-        \textit{\songComposer}% Composer
-    \end{flushright}
-    % Conditionally display Key, Capo, and Artist
+\def\songTitle{#1}% Set the title
+\setkeys{song}{#2}% Set the rest of the keys
+\section*{\songTitle}% Title
+\subsection*{\songSubtitle}% Subtitle
+
+% Print the composer, key, and capo if they are not empty
+% Define counters for non-empty fields
+\newcounter{nonEmptyFields}
+\setcounter{nonEmptyFields}{0}
+\ifx\songComposer\empty\else\stepcounter{nonEmptyFields}\fi
+\ifx\songArtist\empty\else\stepcounter{nonEmptyFields}\fi
+\ifx\songKey\empty\else\stepcounter{nonEmptyFields}\fi
+\ifx\songCapo\empty\else\stepcounter{nonEmptyFields}\fi
+
+% Conditional layout based on the number of non-empty fields
+\ifnum\value{nonEmptyFields}>2
+    % Three or more fields: separate lines with specific alignment
     \begin{flushleft}
-        \ifx\songKey\@empty\else\textit{Key: \songKey}\fi% Only show if not empty
-        \ifx\songCapo\@empty\else\textit{Capo: \songCapo}\fi% Only show if not empty
-        \ifx\songArtist\@empty\else\textit{Artist: \songArtist}\fi% Only show if not empty
+        \ifx\songKey\empty\else Key: \songKey\ \fi
+        \ifx\songCapo\empty\else Capo: \songCapo\fi
     \end{flushleft}
+    \vspace{-\baselineskip} % Remove extra space between lines
+    \begin{flushright}
+        \ifx\songComposer\empty\else \songComposer\fi
+        \ifx\songArtist\empty\else \songArtist\fi
+    \end{flushright}
+\else
+    % One or two fields: same line with alignment
+    \noindent
+    \ifx\songKey\empty \else {Key: \songKey} \ \fi
+    \ifx\songCapo\empty\else {Capo: \songCapo} \fi
+    \hfill
+    \ifx\songComposer\empty\else \songComposer\ \fi
+    \ifx\songArtist\empty\else \songArtist\fi
+\fi
+
+
 }{%
-    % Correctly close all environments and conditionals
-    \endflushleft % Ensure this is closed if it was opened
-    \newpage% Start a new page after each song
+\endflushleft % Ensure this is closed if it was opened
+\newpage% Start a new page after each song
 }
 
 \makeatother
-
 \newcommand{\songComment}[1]{%
     % Formats the text passed as an argument
     \par\small\sffamily\color{gray}#1\par % Apply styling and print the argument

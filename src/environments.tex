@@ -1,37 +1,4 @@
 
-%%%%%  Chorus Environment with conditional visibility  %%%%%
-% % Define a counter to track if the songChorus environment has been used within a song
-% \newcounter{songChorusCounter}
-
-% % Reset the counter to 0 at the beginning of each song environment
-% \AtBeginEnvironment{song}{\setcounter{songChorusCounter}{0}}
-
-% \newenvironment{songChorus}
-% {%
-%     % Increment the songChorusCounter
-%     \stepcounter{songChorusCounter}%
-%     % Begin the mdframed environment to always show the grey bar and "Chorus" line
-%     \begin{mdframed}[leftline=true, linecolor=gray, linewidth=2pt, topline=false, bottomline=false, rightline=false]%
-%         \textit{Chorus}%
-%         \par%
-%         % Check if the songChorusCounter is greater than 1
-%         \ifnum\value{songChorusCounter}>1%
-%         % If greater than 1, gobble the content
-%         \setbox0\vbox\bgroup%
-%         \fi%
-%         }
-%         {%
-%         % Check if the songChorusCounter is greater than 1
-%         \ifnum\value{songChorusCounter}>1%
-%         % If greater than 1, end gobbling the content
-%         \egroup%
-%         \fi%
-%         % End the mdframed environment
-%     \end{mdframed}%
-% }
-
-%%%%%  Chorus Environment, all are visible  %%%%%
-%% set visibility by removing ChordPro content %%
 \newenvironment{songChorus}
 {%
     % Begin the mdframed environment to always show the grey bar and "Chorus" line
