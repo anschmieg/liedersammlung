@@ -30,14 +30,14 @@ def chordpro_to_latex(input):
     }
     directives = {
         "comment": "songComment",
-        "start_of_chorus": "",
-        "end_of_chorus": "",
+        "start_of_chorus": "begin{songChorus}",
+        "end_of_chorus": "end{songChorus}",
         "start_of_verse": "",
         "end_of_verse": "",
         "start_of_bridge": "",
         "end_of_bridge": "",
-        "soc": "",
-        "eoc": "",
+        "soc": "begin{songChorus}",
+        "eoc": "end{songChorus}",
         "sov": "",
         "eov": "",
         "sob": "",

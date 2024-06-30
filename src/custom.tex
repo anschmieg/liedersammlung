@@ -2,6 +2,11 @@
 \usepackage{keyval}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{mdframed}
+
+% set variable for section heading vspace 
+\newlength{\sectionVspace}
+\setlength{\sectionVspace}{3pt}
 
 % Define the song keys
 \makeatletter
@@ -24,13 +29,13 @@
     \section*{\songTitle}% Title
     \subsection*{\songSubtitle}% Subtitle
     \begin{flushright}
-    \textit{\songComposer}% Composer
+        \textit{\songComposer}% Composer
     \end{flushright}
     % Conditionally display Key, Capo, and Artist
     \begin{flushleft}
-    \ifx\songKey\@empty\else\textit{Key: \songKey}\fi% Only show if not empty
-    \ifx\songCapo\@empty\else\textit{Capo: \songCapo}\fi% Only show if not empty
-    \ifx\songArtist\@empty\else\textit{Artist: \songArtist}\fi% Only show if not empty
+        \ifx\songKey\@empty\else\textit{Key: \songKey}\fi% Only show if not empty
+        \ifx\songCapo\@empty\else\textit{Capo: \songCapo}\fi% Only show if not empty
+        \ifx\songArtist\@empty\else\textit{Artist: \songArtist}\fi% Only show if not empty
     \end{flushleft}
 }{%
     % Correctly close all environments and conditionals
@@ -44,3 +49,5 @@
     % Formats the text passed as an argument
     \par\small\sffamily\color{gray}#1\par % Apply styling and print the argument
 }
+
+\input{environments.tex}
