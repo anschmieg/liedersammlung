@@ -29,7 +29,7 @@ def chordpro_to_latex(input):
         # "time": "tempo",
     }
     directives = {
-        "comment": "",
+        "comment": "songComment",
         "start_of_chorus": "",
         "end_of_chorus": "",
         "start_of_verse": "",
@@ -62,11 +62,14 @@ def chordpro_to_latex(input):
         # if directive is a song property, store it in the dictionary
         if content and directive in meta_directives:
             song_meta[directive] = content
+        # Special handling for comments to output as \songComment{text}
+        elif directive == "comment" and content:
+            output += "\\" + directives[directive] + "{" + content + "}\n"
         # if directive is valid and has content, add it as an argument
-        elif content and directive in directives:
+        elif content and directive in directives and directives[directive]:
             output += "\\" + directives[directive] + "{" + content + "}\n"
         # otherwise just add the directive
-        elif directive in directives:
+        elif directive in directives and directives[directive]:
             output += "\\" + directives[directive] + "\n"
         # if directive is unknown, add it as plain text
         else:

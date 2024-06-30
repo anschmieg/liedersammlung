@@ -1,30 +1,46 @@
+\usepackage{kvoptions}
 \usepackage{keyval}
+\usepackage{graphicx}
+\usepackage{xcolor}
 
+% Define the song keys
 \makeatletter
-% Define the keys
 \define@key{song}{subtitle}{\def\songSubtitle{#1}}
 \define@key{song}{composer}{\def\songComposer{#1}}
-\define@key{song}{lyrics}{\def\songLyrics{#1}}
 \define@key{song}{key}{\def\songKey{#1}}
 \define@key{song}{capo}{\def\songCapo{#1}}
+\define@key{song}{artist}{\def\songArtist{#1}} % Define the artist key
+
+% Default values
+\newcommand{\songSubtitle}{Unknown Subtitle}
+\newcommand{\songComposer}{Unknown Composer}
+\newcommand{\songKey}{\@empty} % Use \@empty for comparison
+\newcommand{\songCapo}{\@empty} % Use \@empty for comparison
+\newcommand{\songArtist}{\@empty} % Default value for artist
+
+\newenvironment{song}[2]{%
+    \def\songTitle{#1}% Set the title
+    \setkeys{song}{#2}% Set the rest of the keys
+    \section*{\songTitle}% Title
+    \subsection*{\songSubtitle}% Subtitle
+    \begin{flushright}
+    \textit{\songComposer}% Composer
+    \end{flushright}
+    % Conditionally display Key, Capo, and Artist
+    \begin{flushleft}
+    \ifx\songKey\@empty\else\textit{Key: \songKey}\fi% Only show if not empty
+    \ifx\songCapo\@empty\else\textit{Capo: \songCapo}\fi% Only show if not empty
+    \ifx\songArtist\@empty\else\textit{Artist: \songArtist}\fi% Only show if not empty
+    \end{flushleft}
+}{%
+    % Correctly close all environments and conditionals
+    \endflushleft % Ensure this is closed if it was opened
+    \newpage% Start a new page after each song
+}
+
 \makeatother
 
-\newenvironment{song}[2]{ % This environment takes 2 arguments: the title and a set of key-value pairs
-    \def\songTitle{#1} % Set the title
-    \setkeys{song}{#2} % Set the rest of the keys
-    \section*{\songTitle} % Title
-    \subsection*{\songSubtitle} % Subtitle
-    \begin{flushright}
-    \textit{\songComposer} % Composer
-    \end{flushright}
-    \begin{verse}
-    \songLyrics % Lyrics
-    \end{verse}
-    \begin{flushleft}
-    \textit{Key: \songKey} % Key
-    \textit{Capo: \songCapo} % Capo
-    \end{flushleft}
-}
-{
-    \newpage % Start a new page after each song
+\newcommand{\songComment}[1]{%
+    % Formats the text passed as an argument
+    \par\small\sffamily\color{gray}#1\par % Apply styling and print the argument
 }
